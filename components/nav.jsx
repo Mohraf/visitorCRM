@@ -9,11 +9,11 @@ export default () => {
       <div className="nav-wrapper">
         {auth?.authenticated ? (
           <a href="/" className="brand-logo" style={{ paddingLeft: '15px' }}>
-            BuzzwordCRM
+            Visitor CRM
           </a>
         ) : (
           <a href="/" className="brand-logo" style={{ paddingLeft: '15px' }}>
-            BuzzwordCRM
+            Visitor CRM
           </a>
         )}
 

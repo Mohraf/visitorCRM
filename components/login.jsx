@@ -17,7 +17,7 @@ export default () => (
             letterSpacing: '-0.00833em',
           }}
         >
-          BuzzwordCRM
+          Visitor CRM
         </h1>
       </div>
       <div className="row">
