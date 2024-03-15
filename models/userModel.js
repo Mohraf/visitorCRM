@@ -1,10 +1,10 @@
 const db = require('../db');
 
-const FIND_BY_CALENDLY_UID_SQL = `SELECT * FROM users WHERE calendly_uid = ?`;
-const FIND_BY_ID_SQL = `SELECT * FROM users WHERE id = ?`;
-const FIND_BY_ACCESS_TOKEN_SQL = `SELECT * FROM users WHERE access_token = ?`;
-const CREATE_SQL = `INSERT INTO users (calendly_uid, access_token, refresh_token) VALUES (?, ?, ?)`;
-const UPDATE_SQL = `UPDATE users SET access_token = ?, refresh_token = ? WHERE id = ?`;
+const FIND_BY_CALENDLY_UID_SQL = `SELECT * FROM users WHERE calendly_uid = $1`;
+const FIND_BY_ID_SQL = `SELECT * FROM users WHERE id = $1`;
+const FIND_BY_ACCESS_TOKEN_SQL = `SELECT * FROM users WHERE access_token = $1`;
+const CREATE_SQL = `INSERT INTO users (calendly_uid, access_token, refresh_token) VALUES ($1, $2, $3)`;
+const UPDATE_SQL = `UPDATE users SET access_token = $1, refresh_token = $1 WHERE id = $1`;
 
 class UserModel {
   constructor(connection) {
@@ -26,52 +26,26 @@ class UserModel {
   }
 
   async findByCalendlyUserId(calendlyUid) {
-    return new Promise((resolve, reject) => {
-      db.get(FIND_BY_CALENDLY_UID_SQL, [calendlyUid], (err, row) => {
-        if (err) return reject(err);
-
-        resolve(row);
-      });
-    });
+    const result = await this.connection.query(FIND_BY_CALENDLY_UID_SQL, [calendlyUid]);
+    return result.rows[0]; // Assuming we expect only one user for a given calendlyUid
   }
 
   async findById(id) {
-    return new Promise((resolve, reject) => {
-      db.get(FIND_BY_ID_SQL, [id], (err, row) => {
-        if (err) return reject(err);
-
-        resolve(row);
-      });
-    });
+    const result = await this.connection.query(FIND_BY_ID_SQL, [id]);
+    return result.rows[0];
   }
 
   async findByAccessToken(accessToken) {
-    return new Promise((resolve, reject) => {
-      db.get(FIND_BY_ACCESS_TOKEN_SQL, [accessToken], (err, row) => {
-        if (err) return reject(err);
-
-        resolve(row);
-      });
-    });
+    const result = await this.connection.query(FIND_BY_ACCESS_TOKEN_SQL, [accessToken]);
+    return result.rows[0];
   }
 
   async update(id, { accessToken, refreshToken }) {
-    return new Promise((resolve, reject) => {
-      db.run(UPDATE_SQL, [accessToken, refreshToken, id], (err, row) => {
-        if (err) return reject(err);
-
-        resolve(row);
-      });
-    });
+    await this.connection.query(UPDATE_SQL, [accessToken, refreshToken, id]);
   }
 
   async create({ calendlyUid, accessToken, refreshToken }) {
-    return new Promise((resolve, reject) => {
-      db.run(CREATE_SQL, [calendlyUid, accessToken, refreshToken], (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+    await this.connection.query(CREATE_SQL, [calendlyUid, accessToken, refreshToken]);
   }
 }
 
